@@ -1,3 +1,9 @@
+/*!	\file channel.h
+ *  \brief Channels public API
+ *
+ *  These are the functions used to communicate via a channel,
+ *  This is what most developers will use, once the channels are defined and configured
+ */
 #ifndef _CANOPUS_CHANNEL_H_
 #define _CANOPUS_CHANNEL_H_
 
@@ -11,10 +17,7 @@ typedef struct channel_t channel_t;
 typedef /*TODO const*/ struct channel_driver_t channel_driver_t;
 typedef const struct channel_driver_config_t channel_driver_config_t;
 
-/* Channels public API:
- *  This are the functions used to communicate via a channel,
- *  This is what most developers will use, once the channels are defined and configured
- */
+
 
 /**
  * @return RV_TIMEOUT RV_SUCCESS

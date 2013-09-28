@@ -53,10 +53,16 @@ void PLATFORM_ss_is_ready(subsystem_t *ss) {
 	ss->state->status = SS_ST_READY;
 }
 
+//! Sets a subsystem's expected heartbeats.
+/*!
+ *	\param ss Relevant subsystem
+ *	\param heartbeat_bits Heartbeat bits
+ */
 void PLATFORM_ss_expect_heartbeats(subsystem_t *ss, uint8_t heartbeat_bits) {
 	ss->state->expected_heartbeats = heartbeat_bits;
 }
 
+//! Mark a subsystem as alive (give a heartbeat)
 void PLATFORM_ss_is_alive(subsystem_t *ss, uint8_t heartbeat_bit) {
 	ss->state->current_heartbeats |= heartbeat_bit;
 }
@@ -115,14 +121,22 @@ retval_t PLATFORM_wait_mode_change(const subsystem_t *ss, satellite_mode_e *mode
 #define SEMAPHORE_TIMEOUT_POLLING   0
 #define SEMAPHORE_TIMEOUT_BLOCKING  portMAX_DELAY
 
+//! Start a subsystem's task
+/*!
+ * 	\param ss The subsystem we're starting
+ */
 static retval_t subsystemTaskCreate(subsystem_t* ss) {
     subsystem_config_t* ss_config = ss->config;
     subsystem_state_t* ss_state = ss->state;
     portBASE_TYPE rv;
 
     log_report_fmt(LOG_SS_PLATFORM, "Creating subsystem task: %s (stack size: %d bytes)\r\n", ss_config->name, ss_config->usStackDepth * sizeof( portSTACK_TYPE ));
-	ss_state->status = SS_ST_BOOTING;
+
+    // Set the subsystem's state as BOOTING
+    ss_state->status = SS_ST_BOOTING;
 	PLATFORM_ss_expect_heartbeats(ss, HEARTBEAT_MAIN_TASK);
+
+	// Create the subsystem's semaphore
     vSemaphoreCreateBinary(ss_state->semphr);
     assert(NULL != ss_state->semphr);
     rv = xSemaphoreTake(ss_state->semphr, SEMAPHORE_TIMEOUT_POLLING);
@@ -130,6 +144,9 @@ static retval_t subsystemTaskCreate(subsystem_t* ss) {
 
     assert(ss_config->uxPriority < configMAX_PRIORITIES);
     assert(ss_config->uxPriority < WATCHDOG_TASK_PRIORITY);
+
+    // Finally create the task
+    // Notice each subsystem receives itself as task parameter
     rv = xTaskCreate(
     		ss->api->main_task,
     		(signed char *)ss_config->name,
@@ -167,6 +184,7 @@ static void report_ss_states_and_hang(bool do_hang) {
     if (do_hang && !all_ready) hang();
 }
 
+//! Start all subsystem tasks (except PLATFORM's, as it's already running)
 static void start_ss_tasks() {
 	ss_id_e i;
 
@@ -208,6 +226,12 @@ static bool wait_all_ss_ready(portTickType xTicksTimeout) {
     return ready;
 }
 
+//! Change satellite mode, inform all subsystems and wait for them to be ready.
+/*!
+ * 	\param new_mode Mode to which we'll change
+ * 	\param perSSTimeout_ticks Max time to wait for each subsystem to be ready
+ *
+ */
 static retval_t mode_change_synchronous(satellite_mode_e new_mode, portTickType perSSTimeout_ticks) {
 	// PM Has the highest priority, so xSemaphoreGive() will not force a context switch
 	ss_id_e i;
@@ -247,6 +271,7 @@ static retval_t mode_change_synchronous(satellite_mode_e new_mode, portTickType 
     return answer;
 }
 
+//! Check that no subsystems missed their heartbeats, and reset the watchdog
 static void check_and_update_heartbeat_watchdog() {
 	ss_id_e i;
 	bool all_alive;
@@ -312,7 +337,7 @@ static void increment_reboot_counter() {
 	MEMORY_nvram_save(&nvram.platform.reset_count, sizeof(nvram.platform.reset_count));
 }
 
-//! Initializes devices (opens FPGA control channel)
+//! Initializes devices (opens FPGA control channel and enables watchdog)
 static void initialize_devices() {
     watchdog_enable(SYSTEM_WATCHDOG_INTERVAL_s);
 
@@ -330,7 +355,7 @@ static void initialize_devices() {
 /*!
  * 	\param pvParameters \ref SUBSYSTEM_PLATFORM cast as void *
  *
- * 	This task is a state machine, with it's state determined by \ref g_mode.
+ * 	This task is a state machine, with its state determined by \ref g_mode.
  * 	It initializes all subsystems and then keeps everything running.
  */
 static void PLATFORM_main_task(void* pvParameters) {
@@ -363,6 +388,7 @@ static void PLATFORM_main_task(void* pvParameters) {
 	PLATFORM_ss_is_ready(ss);
 	PLATFORM_ss_expect_heartbeats(ss, HEARTBEAT_MAIN_TASK);
 
+	// Start each subsystem's task
 	start_ss_tasks();
     if (!wait_all_ss_ready(PM_SS_BOOT_TIMEOUT_MS / portTICK_RATE_MS)) {
     	report_ss_states_and_hang(true);
@@ -377,6 +403,8 @@ static void PLATFORM_main_task(void* pvParameters) {
 			PLATFORM_ss_is_ready(ss);
     	}
 
+    	// Mode changes from BOOTING to INITIALIZING, and when vitals are ready,
+    	// to SURVIVAL
     	switch (PLATFORM_current_satellite_mode()) {
 			case SM_BOOTING:
 				PLATFORM_request_mode_change(SM_INITIALIZING);
@@ -398,7 +426,8 @@ static void PLATFORM_main_task(void* pvParameters) {
 }
 
 /**************************** COMMANDS ************************/
-
+//! \defgroup platform_command_handlers PLATFORM Subsystem command handlers
+//! @{
 static retval_t cmd_get_telemetry_beacon(const subsystem_t *self, frame_t * iframe, frame_t * oframe) {
 	frame_put_u32(oframe, PLATFORM_get_cpu_uptime_s());
 	frame_put_u24(oframe, nvram.platform.reset_count);
@@ -589,7 +618,9 @@ static retval_t cmd_get_fpga_ticks(const subsystem_t *self, frame_t *iframe, fra
 
 	return frame_put_u64(oframe, ticks);
 }
+//! @}
 
+//! PLATFORM Subsystem's command list
 const static ss_command_handler_t subsystem_commands[] = {
     DECLARE_BASIC_COMMANDS("uptime_s:u32, resetCount:u24, currentMode:u8, lastBootReason:u32", ""),
     DECLARE_COMMAND(SS_CMD_PM_SET_MODE, cmd_set_mode, "set", "Force a satellite mode change to the new mode", "mode:u8", ""),
@@ -608,6 +639,7 @@ const static ss_command_handler_t subsystem_commands[] = {
     DECLARE_COMMAND(SS_CMD_PM_GET_FPGA_TICKS, cmd_get_fpga_ticks, "getFpgaTicks", "Get Tick counter from FPGA", "", "ticks:u64"),
 };
 
+//! PLATFORM subsystem API
 static subsystem_api_t subsystem_api = {
     .main_task = &PLATFORM_main_task,
     .command_execute = &ss_command_execute,

@@ -54,9 +54,12 @@ typedef enum satellite_mode_e {
     SM_COUNT
 } satellite_mode_e;
 
-/** Enumrates all subsystems in the satellite **/
+//! Enumerates all subsystems in the satellite
+/*!
+ * 	This enum sets the subsystem initialization order
+ */
 typedef enum ss_id_e {
-	/* This enum sets the subsystem initialization order */
+
     SS_PLATFORM = 0,     /**< plataform manager */
     SS_MEMORY,
     SS_CDH,        /**< command and data handling */
@@ -75,6 +78,7 @@ typedef enum ss_id_e {
     SS_MAX
 } ss_id_e;
 
+//! Subsystem states
 typedef enum ss_st_e {
 	SS_ST_BOOTING,
 	SS_ST_READY,
@@ -115,16 +119,19 @@ typedef portTASK_FUNCTION(ss_main_task_t, ss_main_context);
 typedef retval_t ss_command_execute_t(const struct subsystem_t *self, frame_t *frame_in, frame_t *frame_out, uint32_t sequence_number);
 typedef retval_t ss_initialize_t(const struct subsystem_t *self);
 
+// Subsystem API object
 typedef const struct subsystem_api_t {
-    ss_main_task_t *main_task;
-    ss_command_execute_t *command_execute;
+    ss_main_task_t *main_task;				//!< Subsystem's main task
+    ss_command_execute_t *command_execute;	//!<
 } subsystem_api_t;
 
+//! Subsystem unit tests
 typedef struct ss_tests_t {
-	const UnitTest *tests;
-	size_t count;
+	const UnitTest *tests; //!< Array of UnitTests
+	size_t count;			//!< Amount of tests for this subsystem
 } ss_tests_t;
 
+//! Subsystem configuration object
 typedef const struct subsystem_config {
     unsigned portBASE_TYPE uxPriority; /**< task priority */
     unsigned portSHORT usStackDepth;   /**< task stack depth */
@@ -135,15 +142,16 @@ typedef const struct subsystem_config {
     size_t command_handlers_count;
 } subsystem_config_t;
 
+//! Declares the command handler array for a subsystem
 #define DECLARE_COMMAND_HANDLERS(__command_handlers)	\
 	.command_handlers		= __command_handlers,		\
 	.command_handlers_count = ARRAY_COUNT(__command_handlers)	\
 
 /** Instance of a subsystem. **/
 typedef const struct subsystem_t {
-    subsystem_api_t  * const api;
-    subsystem_config_t * const config;
-    subsystem_state_t *state;
+    subsystem_api_t  * const api;		//!< API: Task and command handlers
+    subsystem_config_t * const config;	//!< Subsystem configuration
+    subsystem_state_t *state;			//!< State information
 } subsystem_t;
 
 typedef enum { SS_CRITICAL_ERR, SS_FATAL_ERR } ss_error_e;

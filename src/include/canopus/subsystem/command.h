@@ -1,3 +1,9 @@
+/*!	\file command.h
+ *  \brief Commands and related definitions
+ *
+ *	This file includes all possible CDH commands for each subsystem.
+ *	It also defines interfaces to declare command handlers.
+ */
 #ifndef __COMMAND_H__
 #define __COMMAND_H__
 
@@ -7,6 +13,10 @@
 
 struct subsystem_t;
 
+//! \defgroup command_indexes Command definitions and array indexes
+//! @{
+
+//! Basic commands
 enum ss_cmd_e {
 	SS_CMD_GET_NAME = 0,
 	SS_CMD_GET_TELEMETRY_BEACON,
@@ -14,9 +24,10 @@ enum ss_cmd_e {
 	SS_CMD_RUN_TEST,
 	SS_CMD_GET_TELEMETRY_BEACON_ASCII,
 
-	SS_CMD_SS_START = 0x20
+	SS_CMD_SS_START = 0x20 //!< Specific subsystem commands' first index
 };
 
+//! PLATFORM subsystem commands
 enum ss_cmd_platform_e {
     SS_CMD_PM_SET_MODE = SS_CMD_SS_START,
     SS_CMD_PM_SOFT_RESET_SYSTEM,
@@ -34,6 +45,7 @@ enum ss_cmd_platform_e {
     SS_CMD_PM_UART_DISCONNECT,
 };
 
+//! MEMORY subsystem commands
 enum ss_cmd_memory_e {
 	SS_CMD_MM_MEMORY_READ = SS_CMD_SS_START,
 	SS_CMD_MM_MEMORY_WRITE,
@@ -72,6 +84,7 @@ enum ss_cmd_memory_e {
     SS_CMD_MM_MEMORY_DECOMPRESS_BCL_LZ77,
 };
 
+//! CDH subsystem commands
 enum ss_cmd_cdh_e {
 	SS_CMD_CDH_DELAY_BEACON = SS_CMD_SS_START,
 
@@ -114,6 +127,7 @@ enum ss_cmd_cdh_e {
 	SS_CMD_GET_SEEN_AX25_CALLS,
 };
 
+//! AOCS subsystem commands
 enum ss_cmd_aocs_e {
     SS_CMD_AOCS_Z_AXIS_DISABLED = SS_CMD_SS_START,
 	SS_CMD_AOCS_SET_DETUMBLING_GAIN,
@@ -138,6 +152,7 @@ enum ss_cmd_aocs_e {
 	SS_CMD_AOCS_CONFIGURE_SAMPLER,
 };
 
+//! POWER subsystem commands
 enum ss_cmd_power_e {
 	SS_CMD_POWER_HARD_RESET_SYSTEM = SS_CMD_SS_START,
 	SS_CMD_POWER_EPS_GET_ALL_ADC_RAW,
@@ -151,6 +166,7 @@ enum ss_cmd_power_e {
 	SS_CMD_EPS_FAST_SAMPLE,
 };
 
+//! PAYLOAD subsystem commands
 enum ss_cmd_payload_e {
 	SS_CMD_PAYLOAD_CHUB_TEST_ALL = SS_CMD_SS_START,
 	SS_CMD_PAYLOAD_DELAY,
@@ -185,11 +201,14 @@ enum ss_cmd_payload_e {
     SS_CMD_SVIP_TRANSACT,
 };
 
+//! THERMAL subsystem commands
 enum ss_cmd_thermal_e {
 	SS_CMD_THERMAL_SET_MATRIX_KEY = SS_CMD_SS_START,
 	SS_CMD_THERMAL_GET_STATUS,
 };
+//! @}
 
+//! Command handler data type
 typedef retval_t(*ss_command_handler_t)(const struct subsystem_t *self, frame_t * frame_in, frame_t * frame_out, uint32_t sequence_number);
 
 retval_t ss_cmd_get_name(const struct subsystem_t *self, frame_t * iframe, frame_t * oframe);
@@ -198,9 +217,20 @@ retval_t ss_get_telemetry_beacon_short(const struct subsystem_t *self, frame_t *
 retval_t ss_get_telemetry_beacon_ascii(const struct subsystem_t *self, frame_t * oframe, uint32_t seqnum);
 retval_t ss_cmd_run_test(const struct subsystem_t *self, frame_t * iframe, frame_t * oframe);
 
+//! Declare a command handler (inside a subsystem's command list)
+/*!
+ * 	\param cmd_id Command id (index in \ref command_indexes)
+ * 	\param cmd_handler Handler for this command
+ *
+ */
 #define DECLARE_COMMAND(cmd_id, cmd_handler, cmd_name, cmd_description, cmd_args_format, cmd_ans_format)\
    [cmd_id] = (ss_command_handler_t)&cmd_handler
 
+//! Declare a subsystem's basic commands (start, telemetry beacons, get name and test)
+/*!
+ * 	\param telemetryFormat Format (data type) for SS_CMD_GET_TELEMETRY_BEACON command
+ * 	\param shortTelemetryFormat Format (data type) for SS_CMD_GET_TELEMETRY_BEACON_SHORT command
+ */
 #define DECLARE_BASIC_COMMANDS(telemetryFormat, shortTelemetryFormat)	\
 	ARRAY_INITIALIZE_DEFAULT_VALUE(SS_CMD_SS_START, ss_command_handler_t), \
 	DECLARE_COMMAND(SS_CMD_GET_NAME, ss_cmd_get_name, "name", "Get subsystem name", "", "name:str"),	\
