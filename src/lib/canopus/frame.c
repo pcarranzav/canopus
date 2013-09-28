@@ -181,6 +181,14 @@ void *frame_get_data_pointer_nocheck(const frame_t *frame, size_t count) {
    return &frame->buf[frame->position];
 }
 
+//! Get a pointer to frame data
+/*!
+ *  \param frame Frame from which to get the pointer
+ *  \param ptr Pointer that will point to the data
+ *  \param count Amount of bytes that we expect to read from the frame (checked to avoid buffer ovf)
+ *
+ *  \return RV_NOSPACE or RV_SUCCESS
+ */
 retval_t frame_get_data_pointer(frame_t *frame, void **ptr, size_t count) {
    if (!frame_hasEnoughData(frame, count)) {
        *ptr = NULL;

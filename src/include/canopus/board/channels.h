@@ -18,9 +18,9 @@ extern const channel_t *const ch_fpga_spi;
 
 //! \defgroup cdh_channels CDH channels
 //! @{
-extern const channel_t *const ch_umbilical_in;  /* x.25 pkt in */
-extern const channel_t *const ch_umbilical_out; /* x.25 pkt out, console out */
-extern const channel_t *const ch_lithium;       /* x.25 pkt in/out */
+extern const channel_t *const ch_umbilical_in;  /*!< x.25 pkt in */
+extern const channel_t *const ch_umbilical_out; /*!< x.25 pkt out, console out */
+extern const channel_t *const ch_lithium;       /*!< x.25 pkt in/out */
 //! @}
 
 //! \defgroup payload_channels PAYLOAD channels

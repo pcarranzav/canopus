@@ -255,6 +255,7 @@ static retval_t cdh_dispatch_commands(frame_t *iframe, frame_t *oframe) {
 
 #define CDH_MINIMUM_FRAME_TRAILER_SPACE 50
 
+//! CDH Command dispatcher task
 static void CDH_rx_task(void *pvParameters) {
 	retval_t rv;
 
@@ -545,6 +546,17 @@ static void initialize_beacon() {
     lithium_set_beacon_data(&radio_beacon);
 }
 
+//! Initialize CDH subsystem
+/*!
+ * - Opens the lithium radio channel.
+ * - Initializes the frame pool
+ * - Initializes the following tasks:
+ * 	- Command dispatcher
+ * 	- Beacon update
+ * 	- Antenna deployment
+ * 	- Delayed commands
+ * - Initializes sampler (?)
+ */
 static void mode_from_booting_to_initialize(const subsystem_t *ss) {
 	initialize_channels();
 
@@ -575,6 +587,7 @@ void initialize_for_testing(const subsystem_t *ss) {
 }
 #endif /* CMOCKERY_TESTING */
 
+//! Control and Data Handling main task
 static void CDH_main_task(void *pvParameters) {
 	satellite_mode_e mode = SM_BOOTING;
 	satellite_mode_e prev_mode;
