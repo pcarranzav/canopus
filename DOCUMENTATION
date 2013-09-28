@@ -1,0 +1,7 @@
+I'm starting to document this project with Doxygen (http://www.stack.nl/~dimitri/doxygen/)
+Luckily, FreeRTOS also uses it.
+
+To generate the reference manual, install doxygen and run it from the repository's root folder.
+You can then see it online at {PROJECT_ROOT}/doc/index.html
+		-- pcarranzav
+
