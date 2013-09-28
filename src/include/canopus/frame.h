@@ -1,36 +1,40 @@
-#ifndef _CANOPUS_FRAME_H_
-#define _CANOPUS_FRAME_H_
-
-/*
- * A frame is a mean to transport data from one place to another,
- * espcially to-from devices and to-from another computer. There
- * are usually to distinct users of a single frame:
- *  . The source/producer, who has data to share. Creates a frame, puts the
+/*!
+ * \file frame.h
+ * \brief Frame communication API
+ *
+ * A frame is a means to transport data from one place to another,
+ * especially to-from devices and to-from another computer. There
+ * are usually two distinct users of a single frame:
+ *  - The source/producer, who has data to share. Creates a frame, puts the
  *    data in the frame, and gives the frame to someone else
- *  . The destination/consumer, who gets a frame with data in it, takes
+ *  - The destination/consumer, who gets a frame with data in it, takes
  *    the data out and knows how to interpret it.
  *
  * A frame has a very precise life cycle:
- *  . It's born (created)
- *  . Data is put into it
- *  . It's mutated so someone else can read the data
- *  . It's discarded, or reused only to read the same data again.
+ *  - It's born (created)
+ *  - Data is put into it
+ *  - It's mutated so someone else can read the data
+ *  - It's discarded, or reused only to read the same data again.
  *
  * There are basically two ways to create a frame
- *  . A static frame can be created at compile time with data
+ *  - A static frame can be created at compile time with data
  *    already in it, using the DECLARE_FRAME() macro family.
- *  . A frame can be created with no data (but storage space). In
+ *  - A frame can be created with no data (but storage space). In
  *    this case data will be added using the frame_put_*() function
  *    family. And then, when it's ready, reset_for_reading() will
- *    set the length to accomodate up to the last writen bit, and
+ *    set the length to accomodate up to the last written bit, and
  *    reset the frame so the destination can read the data.
- *  . In either case, after reading all or some of it, the frame can
+ *  - In either case, after reading all or some of it, the frame can
  *    be reset (with frame_reset()) to read again the same data. This
  *    is usefull in static frames, so fixed frames can be stored in
  *    read only memory.
  *
- * SEE test_frame.c for documentation on how to use them
+ * \see test_frame.c for documentation on how to use them
  */
+
+#ifndef _CANOPUS_FRAME_H_
+#define _CANOPUS_FRAME_H_
+
 
 #include <canopus/types.h>
 #include <canopus/time.h>

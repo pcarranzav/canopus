@@ -15,6 +15,8 @@
 #define MATRIX_KEY_DISABLED 0xbaddca11
 
 /* Priorities for the tasks. */
+//! \defgroup task_priorities Task priorities
+//! @{
 #define TASK_PRIORITY_SUBSYSTEM_PLATFORM	( tskIDLE_PRIORITY + 4 )
 #define TASK_PRIORITY_SUBSYSTEM_MEMORY		( tskIDLE_PRIORITY + 3 )
 #define TASK_PRIORITY_SUBSYSTEM_POWER		( tskIDLE_PRIORITY + 3 )
@@ -24,8 +26,11 @@
 #define TASK_PRIORITY_SUBSYSTEM_PAYLOAD		( tskIDLE_PRIORITY + 2 )
 
 #define TASK_PRIORITY_RADIO					TASK_PRIORITY_SUBSYSTEM_CDH
+//! @}
 
 /* default stack depths for each subsystem's task */
+//! \defgroup stack_sizes Subsystem stack sizes
+//! @{
 #define SUBSYSTEM_MINIMAL_STACKSIZE 1024
 #define STACK_DEPTH_PLATFORM    SUBSYSTEM_MINIMAL_STACKSIZE
 #define STACK_DEPTH_CDH         SUBSYSTEM_MINIMAL_STACKSIZE
@@ -34,6 +39,7 @@
 #define STACK_DEPTH_POWER       SUBSYSTEM_MINIMAL_STACKSIZE
 #define STACK_DEPTH_PAYLOAD     SUBSYSTEM_MINIMAL_STACKSIZE
 #define STACK_DEPTH_THERMAL     SUBSYSTEM_MINIMAL_STACKSIZE
+//! @}
 
 #define METHOD(x) typeof(x) *x
 
@@ -122,7 +128,7 @@ typedef retval_t ss_initialize_t(const struct subsystem_t *self);
 // Subsystem API object
 typedef const struct subsystem_api_t {
     ss_main_task_t *main_task;				//!< Subsystem's main task
-    ss_command_execute_t *command_execute;	//!<
+    ss_command_execute_t *command_execute;	//!< Command execution function
 } subsystem_api_t;
 
 //! Subsystem unit tests

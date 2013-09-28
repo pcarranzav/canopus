@@ -39,20 +39,21 @@ typedef enum endianess {
 	ENDIAN_BIG
 } endian_t;
 
-/* commonly used for I/O operations */
+//! Standard return values
+/*! commonly used for I/O operations */
 typedef enum retval {
 	RV_SUCCESS = 0,
-	RV_TIMEOUT = 1,             /* timer expired */
-	RV_BUSY = 2,                /* queue full, bus locked for contention, etc... */
-	RV_ILLEGAL = 3,             /* illegal/invalid call arguments */
-	RV_NOSPACE = 4,             /* space not available */
-	RV_ERROR = 5,               /* any other error */
-	RV_EXIST = 6,               /* resource exists already */
-	RV_NOENT = 7,               /* entry not available */
-	RV_PERM = 8,                /* call not permitted */
-	RV_PARTIAL = 9,				/* partial operation successfully accomplished */
-	RV_NACK = 10, 				/* everything was alright, except the answer was negative */
-    RV_NOTIMPLEMENTED = 11
+	RV_TIMEOUT = 1,             /*!< timer expired */
+	RV_BUSY = 2,                /*!< queue full, bus locked for contention, etc... */
+	RV_ILLEGAL = 3,             /*!< illegal/invalid call arguments */
+	RV_NOSPACE = 4,             /*!< space not available */
+	RV_ERROR = 5,               /*!< any other error */
+	RV_EXIST = 6,               /*!< resource exists already */
+	RV_NOENT = 7,               /*!< entry not available */
+	RV_PERM = 8,                /*!< call not permitted */
+	RV_PARTIAL = 9,				/*!< partial operation successfully accomplished */
+	RV_NACK = 10, 				/*!< everything was alright, except the answer was negative */
+    RV_NOTIMPLEMENTED = 11		/*!< unimplemented resource */
 } retval_t;
 
 #ifdef BOOL_TYPE_MISSING

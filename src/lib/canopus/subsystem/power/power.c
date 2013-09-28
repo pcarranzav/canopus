@@ -12,13 +12,22 @@
 #include <canopus/drivers/power/ina209_powerdomain.h>
 #include <canopus/drivers/commhub_1500.h>
 
+//! Switch configuration options
+/*!
+ * Set a particular switch to be powered on or off, or free for others to control
+ */
 typedef enum switch_config_e {
 		SW____0 = 0,
 		SW__1__ = 1,
 		SW_FREE,		/* anybody can decide to switch on or off the line, POWER will switch it off when entering the mode */
 } switch_config_e;
 
-/* Column indexes must be in synch with satellite_mode_e in subsystem.h */
+//! Power matrix
+/*!
+ * Defines switch configuration for each possible satellite mode
+ * Column indexes must be in synch with \ref satellite_mode_e in subsystem.h
+ *
+ */
 static const switch_config_e
 power_matrix[][SM_COUNT] = {              		/* OFF    BOOTING 	 INITIALIZING   SURVIVAL   MISSION  LOW_POWER */
 	[POWER_SW_OVERO]						= { SW____0 , SW____0	   , SW____0 ,  SW____0  , SW_FREE , SW____0 },
@@ -424,11 +433,12 @@ static retval_t power_on_and_off_as_matrix(subsystem_t *ss) {
 	return success? RV_SUCCESS : RV_ERROR;
 }
 
+//! Initialize power subsystem channels
 static void initialize_channels() {
 	retval_t rv;
 
     rv = channel_open(ch_eps);
-    if (RV_SUCCESS != rv);
+    if (RV_SUCCESS != rv);  //FIXME something should be done here... souldn't this be an assert?
 
     rv = channel_open(ch_ina_pd3v3);
     if (RV_SUCCESS != rv);

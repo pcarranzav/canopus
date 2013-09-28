@@ -172,8 +172,6 @@ static retval_t cdh_dispatch_commands(frame_t *iframe, frame_t *oframe) {
 	const subsystem_t *ss;
 	uint32_t mac, sequence_number = 0xFFFFFF;
 
-#define LOG_RAW_INCOMING
-
 #ifdef LOG_RAW_INCOMING
 	frame_t aux_to_log;
 	uint8_t b;

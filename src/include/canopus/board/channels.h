@@ -1,6 +1,7 @@
-/*
- * all channels used by 'canopus'
- * it's responsability of each board to initialize them before use.
+/*!
+ * \file channels.h
+ * \brief All channels used by 'canopus'
+ *  It's each board's responsability to implement them and initialize them before use.
  */
 #ifndef _CANOPUS_BOARD_CHANNELS_H
 #define _CANOPUS_BOARD_CHANNELS_H
@@ -8,16 +9,22 @@
 #include <canopus/drivers/device_driver.h>
 #include <canopus/drivers/gyroscope.h>
 
-// ALL
+//! \defgroup fpga_channels FPGA channels
+/*! General platform use */
+//! @{
 extern const channel_t *const ch_fpga_ctrl;
 extern const channel_t *const ch_fpga_spi;
+//! @}
 
-//CDH
+//! \defgroup cdh_channels CDH channels
+//! @{
 extern const channel_t *const ch_umbilical_in;  /* x.25 pkt in */
 extern const channel_t *const ch_umbilical_out; /* x.25 pkt out, console out */
 extern const channel_t *const ch_lithium;       /* x.25 pkt in/out */
+//! @}
 
-// PAYLOAD
+//! \defgroup payload_channels PAYLOAD channels
+//! @{
 extern const channel_t *const ch_svip_power;
 extern const channel_t *const ch_nanowheel;
 
@@ -25,7 +32,10 @@ extern const channel_t *const ch_fpga_hub;
 extern const channel_t *const ch_fpga_slave;
 extern const channel_t *const ch_startracker;
 
-// POWER
+//! @}
+
+//! \defgroup power_channels POWER channels
+//! @{
 extern const channel_t *const ch_eps;
 extern const channel_t *const ch_ina_pd3v3;
 extern const channel_t *const ch_ina_pd5v;
@@ -33,6 +43,7 @@ extern const channel_t *const ch_ina_pd12v;
 extern const channel_t *const ch_switches;
 extern const channel_t *const ch_octopus_gpio;
 extern const channel_t *const ch_octopus_adc;
+//! @}
 
 extern const channel_t memory_channel_0; /* simusat at least */
 
