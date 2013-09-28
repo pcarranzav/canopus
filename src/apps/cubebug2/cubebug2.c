@@ -42,6 +42,13 @@ harakiri(uint32_t index)
 #endif /* HARAKIRI_ENABLED */
 }
 
+//! Initialize main task and scheduler
+/*!
+ *	Performs a \ref harakiri (?).
+ * 	Calls board init function that doesn't need scheduler (\ref board_init_scheduler_not_running).
+ *  Creates main task (\ref PLATFORM_main_task).
+ *  Starts scheduler.
+ */
 int app_main( void )
 {
 	board_init_scheduler_not_running();

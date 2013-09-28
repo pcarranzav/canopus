@@ -4,7 +4,7 @@
 
 #include <canopus/drivers/simusat/remote.h>
 
-#define PORT_RADIO        10000
+#define PORT_RADIO        3001
 
 // ALL
 const channel_t *const ch_fpga_ctrl  = &DECLARE_CHANNEL_REMOTE_PORTMAPPED("", "FpgaSimulator");

@@ -37,7 +37,10 @@
 
 #define METHOD(x) typeof(x) *x
 
-/** Enumrates all the possible modes of the satellite **/
+/*! Enumerates all the possible modes of the satellite **/
+/*! WARNING !!! WARNING !!! when adding modes one must modify the
+ * SATELLITE_MODE_WITH_AOCS macro in aocs.h
+ */
 typedef enum satellite_mode_e {
 	/* Values in synch with power_matrix in POWER (pms.c) */
 	SM_OFF          = 0,
@@ -46,9 +49,7 @@ typedef enum satellite_mode_e {
     SM_SURVIVAL     = 3,
     SM_MISSION      = 4,
     SM_LOW_POWER    = 5,
-   /* WARNING !!! WARNING !!! when adding modes one must modify the
-    * SATELLITE_MODE_WITH_AOCS macro in aocs.h
-    */
+
 
     SM_COUNT
 } satellite_mode_e;
@@ -86,19 +87,20 @@ struct subsystem_api_t;
 struct subsystem_config_t;
 struct subsystem_state_t;
 
-/** subsystem_state_t
- * Mutable structure holding the current state for a subsystem
- **/
+
+//! Mutable structure holding the current state for a subsystem
 typedef struct subsystem_state_t {
-    xTaskHandle task_handle;
-    xSemaphoreHandle semphr;
-    ss_st_e status;
-    uint8_t current_heartbeats;
-    uint8_t expected_heartbeats;
-    void *status_arg_p;
-    uint32_t status_arg_u32;
+    xTaskHandle task_handle;	//!< Subsystem's task handle
+    xSemaphoreHandle semphr;	//!< Subsystem's semaphore
+    ss_st_e status;				//!< Current status
+    uint8_t current_heartbeats;	//!< Current heartbeats
+    uint8_t expected_heartbeats;//!< Expected heartbeats
+    void *status_arg_p;			//!< Pointer to status arguments (?)
+    uint32_t status_arg_u32;	//!< 32 bit status argument (?)
 } subsystem_state_t;
 
+//! \defgroup heartbeat_masks Heartbeat bitmasks
+/*! @{ */
 #define HEARTBEAT_MAIN_TASK		(1 << 0)
 #define HEARTBEAT_2nd_TASK		(1 << 1)
 #define HEARTBEAT_3rd_TASK		(1 << 2)
@@ -107,6 +109,7 @@ typedef struct subsystem_state_t {
 #define HEARTBEAT_6th_TASK		(1 << 5)
 #define HEARTBEAT_7th_TASK		(1 << 6)
 #define HEARTBEAT_8th_TASK		(1 << 7)
+/*! @} */
 
 typedef portTASK_FUNCTION(ss_main_task_t, ss_main_context);
 typedef retval_t ss_command_execute_t(const struct subsystem_t *self, frame_t *frame_in, frame_t *frame_out, uint32_t sequence_number);

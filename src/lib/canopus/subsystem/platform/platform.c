@@ -45,6 +45,10 @@ void PLATFORM_request_mode_change(satellite_mode_e new_mode) {
 	g_next_mode = new_mode;
 }
 
+//! Set a subsystem's status as ready
+/*!
+ *  \param ss Subsystem whose status will be changed
+ */
 void PLATFORM_ss_is_ready(subsystem_t *ss) {
 	ss->state->status = SS_ST_READY;
 }
@@ -308,6 +312,7 @@ static void increment_reboot_counter() {
 	MEMORY_nvram_save(&nvram.platform.reset_count, sizeof(nvram.platform.reset_count));
 }
 
+//! Initializes devices (opens FPGA control channel)
 static void initialize_devices() {
     watchdog_enable(SYSTEM_WATCHDOG_INTERVAL_s);
 
@@ -321,27 +326,40 @@ static void initialize_devices() {
 //    commhub_disconnectUartRx(COMMHUB_UART_ADDR_OVERO_UART_1);
 }
 
+//! Main plaform task
+/*!
+ * 	\param pvParameters \ref SUBSYSTEM_PLATFORM cast as void *
+ *
+ * 	This task is a state machine, with it's state determined by \ref g_mode.
+ * 	It initializes all subsystems and then keeps everything running.
+ */
 static void PLATFORM_main_task(void* pvParameters) {
 	subsystem_t *ss = pvParameters;
     g_previous_mode = SM_OFF;
     g_mode = g_next_mode = SM_BOOTING;
     retval_t rv;
 
+    //Init non volatile ram
     initialize_nvram();
+
     increment_reboot_counter();
     saved_last_boot_reason = nvram.platform.last_boot_reason;
     PLATFORM_save_boot_reason("Unexpected reboot");
 
+    // Initialize board components that need OS services
 	rv = board_init_scheduler_running();
     FUTURE_HOOK_1(PM_board_init_failure, &rv);
 	if (rv != RV_SUCCESS) {
         /* XXX save in subsystem status, report in beacons */
 	}
 
+	// "Booting Manolito"
     display_boot_banner();
 
+    // Open FPGA control channel
     initialize_devices();
 
+    // Set our own status as "ready"
 	PLATFORM_ss_is_ready(ss);
 	PLATFORM_ss_expect_heartbeats(ss, HEARTBEAT_MAIN_TASK);
 
