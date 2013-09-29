@@ -13,7 +13,7 @@ const nvram_t nvram_default = {
 		.persist_sequence_number		  = false,
 		.command_response_delay_ms        = 150, // delay before sending command response
 		                                    /*1234567890123456789012345678901-*/
-		.telecommand_key				  = {"32_BYTESFORAVEWYSECURESECRETKEY"},
+		.telecommand_key				  = {"32_BYTESFORAVERYSECURESECRETKEY"},
 		.FDIR_CDH_LAST_COMMAND_TIMEOUTs	  = 60*60*12,	// 12 hours with no incomming messages will reboot
         .FDIR_CDH_last_command_timeout_mask = FDIR_CDH_LAST_COMMAND_TIMEOUT_MASK_RESET_ALL,
         .one_time_radio_silence_time_s    = 20*60,
